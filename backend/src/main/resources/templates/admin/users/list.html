@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Admin — Người dùng</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body class="admin">
+
+<div th:replace="~{admin/fragments/layout :: sidebar('users')}"></div>
+
+<main class="admin-main">
+    <header class="admin-header">
+        <h1>Người dùng</h1>
+        <p class="admin-header__sub">Danh sách tài khoản trong hệ thống.</p>
+    </header>
+
+    <div th:replace="~{admin/fragments/layout :: flash}"></div>
+
+    <table class="admin-table">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Email</th>
+            <th>Họ tên</th>
+            <th>Vai trò</th>
+            <th>Trạng thái</th>
+            <th>Tạo lúc</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="u : ${users}">
+            <td th:text="${u.id()}">1</td>
+            <td th:text="${u.email()}">—</td>
+            <td th:text="${#strings.isEmpty(u.fullName()) ? '—' : u.fullName()}">—</td>
+            <td>
+                <span class="admin-status"
+                      th:classappend="${u.role().name() == 'ADMIN'} ? 'admin-status--admin' : 'admin-status--user'"
+                      th:text="${u.role().name()}">USER</span>
+            </td>
+            <td>
+                <span class="admin-status"
+                      th:classappend="${u.enabled()} ? 'admin-status--delivered' : 'admin-status--cancelled'"
+                      th:text="${u.enabled()} ? 'Đang hoạt động' : 'Đã khoá'">—</span>
+            </td>
+            <td th:text="${#temporals.format(u.createdAt(), 'dd/MM/yyyy')}">—</td>
+            <td>
+                <form th:if="${u.role().name() == 'USER'}"
+                      th:action="@{'/admin/users/' + ${u.id()} + '/promote'}" method="post" class="admin-inline-form">
+                    <button type="submit" class="admin-link">Promote</button>
+                </form>
+                <form th:if="${u.role().name() == 'ADMIN' and u.email() != currentUser?.email()}"
+                      th:action="@{'/admin/users/' + ${u.id()} + '/demote'}" method="post" class="admin-inline-form">
+                    <button type="submit" class="admin-link admin-link--danger">Demote</button>
+                </form>
+                <form th:if="${u.email() != currentUser?.email() and u.enabled()}"
+                      th:action="@{'/admin/users/' + ${u.id()} + '/lock'}" method="post" class="admin-inline-form">
+                    <button type="submit" class="admin-link admin-link--danger">Khoá</button>
+                </form>
+                <form th:if="${u.email() != currentUser?.email() and !u.enabled()}"
+                      th:action="@{'/admin/users/' + ${u.id()} + '/unlock'}" method="post" class="admin-inline-form">
+                    <button type="submit" class="admin-link">Mở khoá</button>
+                </form>
+                <span th:if="${u.email() == currentUser?.email()}" class="admin-muted">(bạn)</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+
+</body>
+</html>

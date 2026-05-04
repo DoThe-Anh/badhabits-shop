@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Admin — Danh mục</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body class="admin">
+
+<div th:replace="~{admin/fragments/layout :: sidebar('categories')}"></div>
+
+<main class="admin-main">
+    <header class="admin-header">
+        <h1>Danh mục</h1>
+        <p class="admin-header__sub">
+            Tổng <strong th:text="${#lists.size(categories)}">0</strong> danh mục
+        </p>
+        <a th:href="@{/admin/categories/new}" class="btn btn--primary" style="float:right;margin-top:-48px;">
+            + Thêm danh mục
+        </a>
+    </header>
+
+    <div th:replace="~{admin/fragments/layout :: flash}"></div>
+
+    <div th:if="${#lists.isEmpty(categories)}" class="admin-empty">
+        Chưa có danh mục nào.
+        <a th:href="@{/admin/categories/new}">Thêm danh mục đầu tiên</a>.
+    </div>
+
+    <table th:unless="${#lists.isEmpty(categories)}" class="admin-table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Slug</th>
+            <th>Tên hiển thị</th>
+            <th>Mô tả</th>
+            <th>Thao tác</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="c : ${categories}">
+            <td><code th:text="${c.getId()}">1</code></td>
+            <td><code th:text="${c.slug()}">slug</code></td>
+            <td th:text="${c.name()}">Tên</td>
+            <td th:text="${c.description()}">—</td>
+            <td>
+                <a th:href="@{'/admin/categories/' + ${c.getId()} + '/edit'}" class="admin-link">Sửa</a>
+                <form th:action="@{'/admin/categories/' + ${c.getId()} + '/delete'}" method="post"
+                      style="display:inline;margin-left:8px;"
+                      onsubmit="return confirm('Xoá danh mục này? Sản phẩm thuộc danh mục sẽ mồ côi.');">
+                    <button type="submit" class="admin-link" style="background:none;border:0;color:#c62828;cursor:pointer;">Xoá</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+
+</body>
+</html>

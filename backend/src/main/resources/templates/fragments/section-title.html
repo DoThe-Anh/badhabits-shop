@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="heading(eyebrow, title, link, linkLabel)" class="section-heading">
+    <div class="section-heading__text">
+        <p th:if="${eyebrow}" th:text="${eyebrow}" class="section-heading__eyebrow">Eyebrow</p>
+        <h2 th:text="${title}" class="section-heading__title">Section title</h2>
+    </div>
+    <a th:if="${link}" th:href="${link}"
+       th:text="${linkLabel != null ? linkLabel : 'XEM THÊM →'}"
+       class="section-heading__link">XEM THÊM →</a>
+</div>
+</body>
+</html>

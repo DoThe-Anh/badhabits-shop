@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<header th:fragment="header" class="site-header" data-header>
+    <div class="site-header__inner">
+
+        <button type="button" class="site-header__menu-btn" data-mobile-menu-toggle aria-label="Mở menu">
+            <span></span><span></span><span></span>
+        </button>
+
+        <a th:href="@{/}" class="site-header__logo">BAD HABITS</a>
+
+        <nav class="site-header__nav" data-main-nav>
+            <ul class="site-header__nav-list">
+                <li class="site-header__nav-item">
+                    <a th:href="@{/shop}" class="site-header__link site-header__link--sale">ƯU ĐÃI</a>
+                </li>
+                <li class="site-header__nav-item">
+                    <a th:href="@{/shop}" class="site-header__link">HÀNG MỚI</a>
+                </li>
+                <li class="site-header__nav-item site-header__nav-item--dropdown">
+                    <a th:href="@{/shop}" class="site-header__link">DANH MỤC</a>
+                    <div class="site-header__dropdown">
+                        <a th:href="@{/shop}" class="site-header__dropdown-link">Tất cả sản phẩm</a>
+                        <a th:each="cat : ${categories}"
+                           th:href="@{'/shop/' + ${cat.slug()}}"
+                           th:text="${cat.name()}"
+                           class="site-header__dropdown-link">Áo</a>
+                        <a th:if="${categories == null}" th:href="@{/shop}" class="site-header__dropdown-link">Áo</a>
+                        <a th:if="${categories == null}" th:href="@{/shop}" class="site-header__dropdown-link">Quần</a>
+                        <a th:if="${categories == null}" th:href="@{/shop}" class="site-header__dropdown-link">Áo khoác</a>
+                    </div>
+                </li>
+                <li class="site-header__nav-item site-header__nav-item--dropdown">
+                    <a href="#" class="site-header__link">BỘ SƯU TẬP</a>
+                    <div class="site-header__dropdown">
+                        <a th:href="@{/shop}" class="site-header__dropdown-link">HO25 COLLECTION</a>
+                        <a th:href="@{/shop}" class="site-header__dropdown-link">SUPERTAMP FW24</a>
+                    </div>
+                </li>
+                <li class="site-header__nav-item site-header__nav-item--dropdown">
+                    <a href="#" class="site-header__link">THÔNG TIN</a>
+                    <div class="site-header__dropdown">
+                        <a href="#" class="site-header__dropdown-link">Tuyển dụng</a>
+                        <a href="#" class="site-header__dropdown-link">Cửa hàng</a>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="site-header__actions">
+            <!-- Chưa đăng nhập -->
+            <a sec:authorize="!isAuthenticated()"
+               th:href="@{/login}" class="site-header__login">Đăng nhập</a>
+
+            <!-- Đã đăng nhập (user side) -->
+            <div sec:authorize="isAuthenticated()" class="site-header__user">
+                <a th:href="@{/account}" class="site-header__login"
+                   th:text="${currentUser != null and !#strings.isEmpty(currentUser.fullName())}
+                            ? ${currentUser.fullName()}
+                            : (${currentUser != null} ? ${currentUser.email()} : 'Tài khoản')">
+                    user@example.com
+                </a>
+                <form th:action="@{/logout}" method="post" class="site-header__logout-form">
+                    <button type="submit" class="site-header__login site-header__logout-btn">Đăng xuất</button>
+                </form>
+            </div>
+
+            <a href="#" class="site-header__cart-link"
+               data-cart-drawer-open aria-label="Giỏ hàng">
+                Giỏ hàng (<span class="site-header__cart-count"
+                                th:text="${cart != null ? cart.itemCount : 0}">0</span>)
+            </a>
+        </div>
+    </div>
+</header>
+</body>
+</html>

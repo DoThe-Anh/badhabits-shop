@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<footer th:fragment="footer" class="site-footer">
+    <div class="site-footer__inner">
+        <div class="site-footer__brand">
+            <a th:href="@{/}" class="site-footer__logo">BAD HABITS</a>
+            <p class="site-footer__tagline">Dành cho những ngày khắc nghiệt.</p>
+        </div>
+
+        <div class="site-footer__columns">
+            <div class="site-footer__col">
+                <h4>CHÍNH SÁCH</h4>
+                <ul>
+                    <li><a href="#">Điều khoản sử dụng</a></li>
+                    <li><a href="#">Chính sách bảo mật</a></li>
+                    <li><a href="#">Chính sách cookie</a></li>
+                    <li><a href="#">Chính sách hoàn tiền</a></li>
+                    <li><a href="#">Câu hỏi thường gặp</a></li>
+                </ul>
+            </div>
+            <div class="site-footer__col">
+                <h4>HỖ TRỢ</h4>
+                <ul>
+                    <li><a href="#">Liên hệ</a></li>
+                    <li><a href="#">Vận chuyển</a></li>
+                    <li><a href="#">Đổi / Trả hàng</a></li>
+                    <li><a href="#">Hướng dẫn chọn size</a></li>
+                    <li><a href="#">Cửa hàng</a></li>
+                </ul>
+            </div>
+            <div class="site-footer__col">
+                <h4>KẾT NỐI</h4>
+                <ul class="site-footer__social">
+                    <li><a href="#" aria-label="Instagram">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="5"/>
+                            <circle cx="12" cy="12" r="4"/>
+                            <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
+                        </svg>
+                        Instagram</a></li>
+                    <li><a href="#" aria-label="Facebook">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                        </svg>
+                        Facebook</a></li>
+                    <li><a href="#" aria-label="TikTok">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>
+                        </svg>
+                        TikTok</a></li>
+                </ul>
+            </div>
+            <div class="site-footer__col">
+                <h4>THANH TOÁN</h4>
+                <div class="site-footer__payments">
+                    <span>VISA</span>
+                    <span>MC</span>
+                    <span>MOMO</span>
+                    <span>VNPAY</span>
+                    <span>COD</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="site-footer__bottom">
+        <p>© 2026 BAD HABITS STORE. BẢO LƯU MỌI QUYỀN.</p>
+        <div class="site-footer__lang">
+            <button class="is-active">VN</button>
+            <span>/</span>
+            <button>EN</button>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

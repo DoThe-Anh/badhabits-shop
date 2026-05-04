@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Thanh toán — BAD HABITS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+
+<div th:replace="~{fragments/announcement-bar :: announcement}"></div>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="page-checkout">
+
+    <nav class="breadcrumb">
+        <a th:href="@{/}">Trang chủ</a>
+        <span>/</span>
+        <a th:href="@{/cart}">Giỏ hàng</a>
+        <span>/</span>
+        <span>Thanh toán</span>
+    </nav>
+
+    <header class="category-head">
+        <h1>THANH TOÁN</h1>
+    </header>
+
+    <form th:action="@{/checkout}" method="post" class="checkout-layout" data-checkout-form>
+
+        <section class="checkout-main">
+
+            <fieldset class="checkout-section">
+                <legend>THÔNG TIN GIAO HÀNG</legend>
+                <div class="checkout-grid">
+                    <label class="checkout-field checkout-field--full">
+                        <span>Họ và tên *</span>
+                        <input name="fullName" type="text" required autocomplete="name"
+                               th:value="${prefillFullName}"/>
+                    </label>
+                    <label class="checkout-field">
+                        <span>Email *</span>
+                        <input name="email" type="email" required autocomplete="email"
+                               th:value="${prefillEmail}"/>
+                    </label>
+                    <label class="checkout-field">
+                        <span>Số điện thoại *</span>
+                        <input name="phone" type="tel" required autocomplete="tel"
+                               pattern="[0-9+\s]{9,15}"
+                               th:value="${prefillPhone}"/>
+                    </label>
+                    <label class="checkout-field checkout-field--full">
+                        <span>Địa chỉ *</span>
+                        <input name="address" type="text" required autocomplete="street-address"
+                               th:value="${prefillAddress}"/>
+                    </label>
+                    <label class="checkout-field checkout-field--full">
+                        <span>Tỉnh / Thành phố *</span>
+                        <input name="city" type="text" required autocomplete="address-level2"/>
+                    </label>
+                    <label class="checkout-field checkout-field--full">
+                        <span>Ghi chú (tuỳ chọn)</span>
+                        <textarea name="note" rows="3" placeholder="Ghi chú cho đơn hàng..."></textarea>
+                    </label>
+                </div>
+            </fieldset>
+
+            <fieldset class="checkout-section">
+                <legend>PHƯƠNG THỨC THANH TOÁN</legend>
+                <div class="payment-methods" data-payment-methods>
+                    <label class="payment-method">
+                        <input type="radio" name="paymentMethod" value="cod" checked data-method="cod"/>
+                        <div class="payment-method__body">
+                            <strong>THANH TOÁN KHI NHẬN HÀNG (COD)</strong>
+                            <span>Trả tiền mặt khi nhận hàng. Không phát sinh phí.</span>
+                        </div>
+                    </label>
+                    <label class="payment-method">
+                        <input type="radio" name="paymentMethod" value="bank" data-method="bank"/>
+                        <div class="payment-method__body">
+                            <strong>CHUYỂN KHOẢN NGÂN HÀNG</strong>
+                            <span>Quét QR hoặc chuyển khoản trực tiếp.</span>
+                        </div>
+                    </label>
+                    <label class="payment-method">
+                        <input type="radio" name="paymentMethod" value="momo" data-method="momo"/>
+                        <div class="payment-method__body">
+                            <strong>VÍ MOMO</strong>
+                            <span>Thanh toán qua ví điện tử MoMo.</span>
+                        </div>
+                    </label>
+                    <label class="payment-method">
+                        <input type="radio" name="paymentMethod" value="vnpay" data-method="vnpay"/>
+                        <div class="payment-method__body">
+                            <strong>VNPAY (VISA / MASTERCARD)</strong>
+                            <span>Thanh toán qua cổng VNPAY, an toàn & bảo mật.</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="payment-panel" data-payment-panel="bank" hidden>
+                    <div class="bank-info">
+                        <div class="bank-info__qr">
+                            <div class="qr-placeholder">QR</div>
+                        </div>
+                        <div class="bank-info__details">
+                            <p><strong>Ngân hàng:</strong> Vietcombank</p>
+                            <p><strong>Chủ tài khoản:</strong> BAD HABITS STORE CO., LTD</p>
+                            <p><strong>Số tài khoản:</strong> 0123 456 7890</p>
+                            <p><strong>Nội dung:</strong> [Họ tên] + [SĐT]</p>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </section>
+
+        <aside class="checkout-sidebar">
+            <h2>ĐƠN HÀNG CỦA BẠN</h2>
+            <ul class="checkout-items">
+                <li th:each="item : ${cart.items}" class="checkout-item">
+                    <div class="checkout-item__image">
+                        <img th:src="${item.image}" th:alt="${item.name}" loading="lazy"/>
+                        <span class="checkout-item__count" th:text="${item.quantity}">1</span>
+                    </div>
+                    <div class="checkout-item__info">
+                        <h4 th:text="${item.name}">Product</h4>
+                        <p>
+                            <span th:if="${item.size != null}" th:text="${item.size}"></span>
+                            <span th:if="${item.size != null and item.color != null}"> · </span>
+                            <span th:if="${item.color != null}" th:text="${item.color}"></span>
+                        </p>
+                    </div>
+                    <p class="checkout-item__price" th:text="${item.lineTotalFormatted}">520.000₫</p>
+                </li>
+            </ul>
+
+            <dl class="checkout-summary">
+                <div><dt>Tạm tính</dt><dd th:text="${cart.subtotalFormatted}">520.000₫</dd></div>
+                <div><dt>Phí vận chuyển</dt><dd th:text="${cart.shippingFeeFormatted}">30.000₫</dd></div>
+                <div class="checkout-summary__total">
+                    <dt>Tổng cộng</dt>
+                    <dd th:text="${cart.totalFormatted}">550.000₫</dd>
+                </div>
+            </dl>
+
+            <button type="submit" class="btn btn--primary btn--block">ĐẶT HÀNG</button>
+            <p class="checkout-secure">Thanh toán an toàn. Thông tin của bạn được bảo mật.</p>
+        </aside>
+    </form>
+
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/cart-drawer :: drawer}"></div>
+
+<script th:src="@{/js/main.js}" defer></script>
+</body>
+</html>

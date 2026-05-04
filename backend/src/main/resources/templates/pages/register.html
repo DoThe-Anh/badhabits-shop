@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Đăng ký — BAD HABITS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body class="page-auth">
+
+<div th:replace="~{fragments/announcement-bar :: announcement}"></div>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main>
+    <div class="auth">
+        <div class="auth__card">
+            <h1 class="auth__title">ĐĂNG KÝ</h1>
+            <p class="auth__sub">Tạo tài khoản để theo dõi đơn hàng và nhận ưu đãi.</p>
+
+            <div th:if="${errorMessage}" class="auth__alert auth__alert--error"
+                 th:text="${errorMessage}"></div>
+
+            <form th:action="@{/register}" method="post" class="auth__form">
+                <label class="auth__field">
+                    <span>Họ và tên *</span>
+                    <input type="text" name="fullName" required th:value="${fullName}"
+                           autocomplete="name"
+                           placeholder="Nguyễn Văn A"/>
+                </label>
+                <label class="auth__field">
+                    <span>Email *</span>
+                    <input type="email" name="email" required th:value="${email}"
+                           autocomplete="email"
+                           placeholder="you@example.com"/>
+                </label>
+                <label class="auth__field">
+                    <span>Số điện thoại *</span>
+                    <input type="tel" name="phone" required th:value="${phone}"
+                           autocomplete="tel"
+                           pattern="[0-9+\s]{9,15}"
+                           placeholder="0901234567"/>
+                </label>
+                <label class="auth__field">
+                    <span>Địa chỉ *</span>
+                    <input type="text" name="address" required th:value="${address}"
+                           autocomplete="street-address"
+                           placeholder="Số nhà, đường, phường, quận, thành phố"/>
+                </label>
+                <label class="auth__field">
+                    <span>Mật khẩu *</span>
+                    <input type="password" name="password" required minlength="6"
+                           autocomplete="new-password"
+                           placeholder="Tối thiểu 6 ký tự"/>
+                </label>
+
+                <button type="submit" class="btn btn--primary btn--block">ĐĂNG KÝ</button>
+            </form>
+
+            <p class="auth__foot">
+                Đã có tài khoản?
+                <a th:href="@{/login}">Đăng nhập</a>
+            </p>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/cart-drawer :: drawer}"></div>
+
+<script th:src="@{/js/main.js}" defer></script>
+</body>
+</html>

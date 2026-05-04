@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>BAD HABITS STORE — Streetwear từ Sài Gòn</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+
+<div th:replace="~{fragments/announcement-bar :: announcement}"></div>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="page-home">
+
+    <section class="hero">
+        <a href="#" class="hero__slide">
+            <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1800&q=80&auto=format&fit=crop" alt="Ưu đãi đặc biệt"/>
+            <div class="hero__content">
+                <p class="hero__eyebrow">ƯU ĐÃI ĐẶC BIỆT</p>
+                <h1 class="hero__title">ĐANG GIẢM GIÁ</h1>
+                <p class="hero__sub">Giảm đến 30% toàn bộ outlet. Áo, quần, áo khoác — chỉ đến hết tuần.</p>
+                <span class="btn btn--primary">MUA NGAY</span>
+            </div>
+        </a>
+        <a href="#" class="hero__slide">
+            <img src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=1800&q=80&auto=format&fit=crop" alt="Bộ sưu tập HO25"/>
+            <div class="hero__content hero__content--right">
+                <p class="hero__eyebrow">BỘ SƯU TẬP HO25</p>
+                <h1 class="hero__title">MÙA MỚI,<br/>PHONG CÁCH MỚI</h1>
+                <p class="hero__sub">Áo thun dáng rộng, áo nỉ và áo khoác dành cho những ngày khắc nghiệt.</p>
+                <span class="btn btn--primary">XEM BỘ SƯU TẬP</span>
+            </div>
+        </a>
+        <a href="#" class="hero__slide">
+            <img src="https://images.unsplash.com/photo-1523381294911-8d3cead13475?w=1800&q=80&auto=format&fit=crop" alt="Hàng mới về"/>
+            <div class="hero__content">
+                <p class="hero__eyebrow">VỪA LÊN KỆ</p>
+                <h1 class="hero__title">HÀNG MỚI VỀ</h1>
+                <p class="hero__sub">Những thiết kế mới nhất — áo thun, áo nỉ, áo khoác cho mùa này.</p>
+                <span class="btn btn--primary">XEM NGAY</span>
+            </div>
+        </a>
+    </section>
+
+    <section class="section section--strip">
+        <div th:replace="~{fragments/section-title :: heading(
+                eyebrow='MÙA HÈ · MÁT MẺ',
+                title='QUẦN ÁO MÙA HÈ',
+                link=@{/shop},
+                linkLabel='XEM TẤT CẢ →')}"></div>
+        <div class="product-slider" data-product-slider data-slider-autoplay="2500">
+            <button type="button" class="product-slider__nav product-slider__nav--prev"
+                    data-slider-prev aria-label="Xem sản phẩm trước">‹</button>
+            <button type="button" class="product-slider__nav product-slider__nav--next"
+                    data-slider-next aria-label="Xem sản phẩm tiếp theo">›</button>
+            <div class="product-slider__track" data-slider-track>
+                <div class="product-slider__slide" th:each="product : ${summerItems}">
+                    <div th:replace="~{fragments/product-card :: card(${product})}"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="promo-banner">
+        <a th:href="@{/shop}" class="promo-banner__link">
+            <img src="https://picsum.photos/seed/lumiere-promo-banner/1800/600" alt="Khuyến mãi"/>
+            <div class="promo-banner__overlay">
+                <p class="promo-banner__eyebrow">PHIÊN BẢN GIỚI HẠN</p>
+                <h2 class="promo-banner__title">TRỞ LẠI LỢI HẠI HƠN</h2>
+                <span class="btn btn--outline-light">XEM THÊM</span>
+            </div>
+        </a>
+    </section>
+
+    <section class="section section--strip">
+        <div th:replace="~{fragments/section-title :: heading(
+                eyebrow='MÙA ĐÔNG · GIỮ ẤM',
+                title='QUẦN ÁO MÙA ĐÔNG',
+                link=@{/shop},
+                linkLabel='XEM TẤT CẢ →')}"></div>
+        <div class="product-slider" data-product-slider>
+            <button type="button" class="product-slider__nav product-slider__nav--prev"
+                    data-slider-prev aria-label="Xem sản phẩm trước">‹</button>
+            <button type="button" class="product-slider__nav product-slider__nav--next"
+                    data-slider-next aria-label="Xem sản phẩm tiếp theo">›</button>
+            <div class="product-slider__track" data-slider-track>
+                <div class="product-slider__slide" th:each="product : ${winterItems}">
+                    <div th:replace="~{fragments/product-card :: card(${product})}"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="lookbook">
+        <div class="lookbook__head">
+            <p class="section-heading__eyebrow">CHIẾN DỊCH</p>
+            <h2 class="section-heading__title">BỘ SƯU TẬP HO 2025</h2>
+        </div>
+        <div class="lookbook__grid">
+            <img src="https://picsum.photos/seed/lookbook-1/800/1100" alt="" loading="lazy"/>
+            <img src="https://picsum.photos/seed/lookbook-2/800/1100" alt="" loading="lazy"/>
+            <img src="https://picsum.photos/seed/lookbook-3/800/1100" alt="" loading="lazy"/>
+            <img src="https://picsum.photos/seed/lookbook-4/800/1100" alt="" loading="lazy"/>
+            <img src="https://picsum.photos/seed/lookbook-5/800/1100" alt="" loading="lazy"/>
+        </div>
+    </section>
+
+    <section class="section section--strip section--dark">
+        <div th:replace="~{fragments/section-title :: heading(
+                eyebrow='OUTLET · GIẢM ĐẾN 30%',
+                title='HÀNG OUTLET HO24',
+                link=@{/shop},
+                linkLabel='XEM TẤT CẢ →')}"></div>
+        <div class="product-grid product-grid--3">
+            <th:block th:each="product : ${saleItems}">
+                <div th:replace="~{fragments/product-card :: card(${product})}"></div>
+            </th:block>
+        </div>
+    </section>
+
+</main>
+
+<div th:replace="~{fragments/newsletter :: newsletter}"></div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/cart-drawer :: drawer}"></div>
+
+<script th:src="@{/js/main.js}" defer></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${isEdit} ? 'Admin — Sửa danh mục' : 'Admin — Thêm danh mục'">Danh mục</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <style>
+        .form-grid { display:grid; grid-template-columns: 1fr; gap:16px; max-width:600px; }
+        .form-grid label { display:block; font-weight:600; font-size:13px; color:#374151; margin-bottom:4px; }
+        .form-grid input[type=text], .form-grid textarea {
+            width:100%; padding:8px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px;
+        }
+        .form-grid .help { font-size:12px; color:#6b7280; margin-top:4px; }
+        .form-grid .field-error { font-size:12px; color:#c62828; margin-top:4px; }
+        .form-grid input.is-invalid, .form-grid textarea.is-invalid { border-color:#c62828; }
+        .form-actions { margin-top:20px; display:flex; gap:12px; }
+    </style>
+</head>
+<body class="admin">
+
+<div th:replace="~{admin/fragments/layout :: sidebar('categories')}"></div>
+
+<main class="admin-main">
+    <header class="admin-header">
+        <h1 th:text="${isEdit} ? 'Sửa danh mục #' + ${category.getId()} : 'Thêm danh mục'">Danh mục</h1>
+        <p class="admin-header__sub">
+            <a th:href="@{/admin/categories}">← Quay lại danh sách</a>
+        </p>
+    </header>
+
+    <div th:replace="~{admin/fragments/layout :: flash}"></div>
+
+    <form th:object="${category}"
+          th:action="${isEdit} ? @{'/admin/categories/' + ${category.getId()}} : @{/admin/categories}"
+          method="post" class="form-grid">
+
+        <div>
+            <label>Slug *</label>
+            <input type="text" name="slug" th:value="${category.slug()}" maxlength="100"
+                   th:classappend="${#fields.hasErrors('slug')} ? 'is-invalid'"
+                   placeholder="tops, bottoms, outerwear..."/>
+            <div class="help">Dùng cho URL filter sản phẩm. Chữ thường, gạch ngang.</div>
+            <div class="field-error" th:if="${#fields.hasErrors('slug')}" th:errors="*{slug}"></div>
+        </div>
+
+        <div>
+            <label>Tên hiển thị *</label>
+            <input type="text" name="name" th:value="${category.name()}" maxlength="200"
+                   th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'"
+                   placeholder="ÁO THUN"/>
+            <div class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+        </div>
+
+        <div>
+            <label>Mô tả</label>
+            <textarea name="description" rows="3" maxlength="1000"
+                      th:classappend="${#fields.hasErrors('description')} ? 'is-invalid'"
+                      th:text="${category.description()}"></textarea>
+            <div class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn--primary"
+                    th:text="${isEdit} ? 'Cập nhật' : 'Tạo danh mục'">Lưu</button>
+            <a th:href="@{/admin/categories}" class="btn">Huỷ</a>
+        </div>
+    </form>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Tài khoản — BAD HABITS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body class="page-account">
+
+<div th:replace="~{fragments/announcement-bar :: announcement}"></div>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main>
+    <div class="auth">
+        <div class="auth__card auth__card--wide">
+            <h1 class="auth__title">TÀI KHOẢN CỦA TÔI</h1>
+
+            <div class="account__info" th:if="${user != null}">
+                <div class="account__row">
+                    <span class="account__label">Họ và tên</span>
+                    <span class="account__value" th:text="${user.fullName() == '' ? '—' : user.fullName()}">—</span>
+                </div>
+                <div class="account__row">
+                    <span class="account__label">Email</span>
+                    <span class="account__value" th:text="${user.email()}">email@example.com</span>
+                </div>
+                <div class="account__row">
+                    <span class="account__label">Số điện thoại</span>
+                    <span class="account__value"
+                          th:text="${#strings.isEmpty(user.phone()) ? '—' : user.phone()}">—</span>
+                </div>
+                <div class="account__row">
+                    <span class="account__label">Địa chỉ</span>
+                    <span class="account__value"
+                          th:text="${#strings.isEmpty(user.address()) ? '—' : user.address()}">—</span>
+                </div>
+                <div class="account__row">
+                    <span class="account__label">Thành viên từ</span>
+                    <span class="account__value"
+                          th:text="${#temporals.format(user.createdAt(), 'dd/MM/yyyy')}">01/01/2026</span>
+                </div>
+            </div>
+
+            <div class="account__actions">
+                <form th:action="@{/logout}" method="post" style="display:inline">
+                    <button type="submit" class="btn btn--outline">ĐĂNG XUẤT</button>
+                </form>
+            </div>
+
+            <div class="account__section">
+                <h2>Đơn hàng của tôi</h2>
+                <p class="auth__sub" th:if="${orders == null or #lists.isEmpty(orders)}">
+                    Chưa có đơn hàng nào. Hãy khám phá <a th:href="@{/shop}">bộ sưu tập mới nhất</a>.
+                </p>
+
+                <ul class="account__orders" th:unless="${orders == null or #lists.isEmpty(orders)}">
+                    <li th:each="order : ${orders}" class="account__order">
+                        <div class="account__order-head">
+                            <strong th:text="${order.orderCode}">BH1001</strong>
+                            <span class="account__order-date"
+                                  th:text="${#temporals.format(order.placedAt, 'dd/MM/yyyy HH:mm')}">01/01/2026</span>
+                            <span class="account__order-status" th:text="${order.statusLabel()}">Chờ xác nhận</span>
+                        </div>
+                        <ul class="account__order-items">
+                            <li th:each="item : ${order.items}">
+                                <span th:text="${item.name}">Product</span>
+                                <span th:if="${item.size != null}" th:text="' · Size ' + ${item.size}"></span>
+                                <span th:if="${item.color != null}" th:text="' · ' + ${item.color}"></span>
+                                <span th:text="' × ' + ${item.quantity}"></span>
+                            </li>
+                        </ul>
+                        <div class="account__order-total">
+                            Tổng: <strong th:text="${order.totalFormatted()}">0₫</strong>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/cart-drawer :: drawer}"></div>
+
+<script th:src="@{/js/main.js}" defer></script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${product.name()} + ' — BAD HABITS'">Product — BAD HABITS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+
+<div th:replace="~{fragments/announcement-bar :: announcement}"></div>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="page-product">
+
+    <nav class="breadcrumb">
+        <a th:href="@{/}">Trang chủ</a>
+        <span>/</span>
+        <a th:href="@{/shop}">Shop</a>
+        <span>/</span>
+        <span th:text="${product.name()}">Product</span>
+    </nav>
+
+    <section class="product-detail">
+        <div class="product-detail__gallery">
+            <div class="product-detail__main-image">
+                <img data-main-image th:src="${product.gallery().get(0)}" th:alt="${product.name()}"/>
+                <span th:if="${product.isNew()}" class="product-card__badge product-card__badge--new">NEW</span>
+                <span th:if="${product.onSale()}"
+                      th:text="'-' + ${product.discountPercent()} + '%'"
+                      class="product-card__badge product-card__badge--sale">-25%</span>
+            </div>
+            <div class="product-detail__thumbs">
+                <button th:each="src, iter : ${product.gallery()}"
+                        type="button"
+                        class="product-detail__thumb"
+                        th:classappend="${iter.index == 0} ? 'is-active' : ''"
+                        th:data-src="${src}">
+                    <img th:src="${src}" alt="" loading="lazy"/>
+                </button>
+            </div>
+        </div>
+
+        <div class="product-detail__info">
+            <p class="product-detail__collection" th:text="${product.collection()}">HO25</p>
+            <h1 class="product-detail__name" th:text="${product.name()}">Product name</h1>
+
+            <p class="product-detail__price">
+                <span th:text="${product.priceFormatted()}" class="product-detail__price-now">520.000₫</span>
+                <span th:if="${product.onSale()}"
+                      th:text="${product.originalPriceFormatted()}"
+                      class="product-detail__price-old">690.000₫</span>
+            </p>
+
+            <p class="product-detail__stock"
+               th:classappend="${product.stock() < 10} ? 'product-detail__stock--low' : ''"
+               th:text="${product.stock() == 0} ? 'Hết hàng' : (${product.stock() &lt; 10} ? 'Chỉ còn ' + ${product.stock()} + ' sản phẩm' : 'Còn hàng')">
+                Còn hàng
+            </p>
+
+            <form th:action="@{/cart/add}" method="post" class="product-detail__form">
+                <input type="hidden" name="productId" th:value="${product.id()}"/>
+
+                <div class="product-detail__section">
+                    <div class="product-detail__label">
+                        <span>MÀU SẮC:</span>
+                        <strong data-selected-color th:text="${product.colors()[0].name()}">BLACK</strong>
+                    </div>
+                    <div class="product-detail__colors" role="radiogroup">
+                        <label th:each="c, iter : ${product.colors()}" class="product-detail__color">
+                            <input type="radio" name="color" th:value="${c.name()}"
+                                   th:checked="${iter.index == 0}"/>
+                            <span th:style="'background:' + ${c.hex()}"
+                                  th:title="${c.name()}"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="product-detail__section">
+                    <div class="product-detail__label">
+                        <span>SIZE:</span>
+                        <a href="#size-guide" class="product-detail__size-guide-link">HƯỚNG DẪN CHỌN SIZE</a>
+                    </div>
+                    <div class="product-detail__sizes" role="radiogroup">
+                        <label th:each="size, iter : ${product.sizes()}" class="product-detail__size-chip">
+                            <input type="radio" name="size" th:value="${size}"
+                                   th:checked="${iter.index == 0}" required/>
+                            <span th:text="${size}">M</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="product-detail__section">
+                    <div class="product-detail__label"><span>SỐ LƯỢNG</span></div>
+                    <div class="qty-stepper" data-qty-stepper>
+                        <button type="button" data-qty-dec aria-label="Giảm">−</button>
+                        <input type="number" name="quantity" value="1" min="1" max="99"/>
+                        <button type="button" data-qty-inc aria-label="Tăng">+</button>
+                    </div>
+                </div>
+
+                <div class="product-detail__actions">
+                    <button type="submit" name="buyNow" value="false" class="btn btn--outline">THÊM VÀO GIỎ</button>
+                    <button type="submit" name="buyNow" value="true" class="btn btn--primary">MUA NGAY</button>
+                </div>
+            </form>
+
+            <div class="product-detail__accordion">
+                <details open>
+                    <summary>MÔ TẢ</summary>
+                    <div class="product-detail__accordion-body">
+                        <p th:text="${product.description()}">Description</p>
+                    </div>
+                </details>
+                <details id="size-guide">
+                    <summary>HƯỚNG DẪN CHỌN SIZE</summary>
+                    <div class="product-detail__accordion-body">
+                        <table class="size-chart">
+                            <thead>
+                            <tr><th>Size</th><th>Ngực (cm)</th><th>Dài áo (cm)</th><th>Vai (cm)</th></tr>
+                            </thead>
+                            <tbody>
+                            <tr><td>S</td><td>100</td><td>68</td><td>48</td></tr>
+                            <tr><td>M</td><td>106</td><td>70</td><td>50</td></tr>
+                            <tr><td>L</td><td>112</td><td>72</td><td>52</td></tr>
+                            <tr><td>XL</td><td>118</td><td>74</td><td>54</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </details>
+                <details>
+                    <summary>CHẤT LIỆU &amp; BẢO QUẢN</summary>
+                    <div class="product-detail__accordion-body">
+                        <p th:text="${product.material()}">Material</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>VẬN CHUYỂN &amp; ĐỔI TRẢ</summary>
+                    <div class="product-detail__accordion-body">
+                        <p>Miễn phí vận chuyển cho đơn từ 500.000₫. Đổi trả trong vòng 7 ngày kể từ khi nhận hàng.</p>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <section th:if="${not #lists.isEmpty(related)}" class="section section--strip">
+        <div class="section-heading">
+            <div class="section-heading__text">
+                <p class="section-heading__eyebrow">YOU MAY ALSO LIKE</p>
+                <h2 class="section-heading__title">SẢN PHẨM LIÊN QUAN</h2>
+            </div>
+        </div>
+        <div class="product-grid product-grid--4">
+            <th:block th:each="p : ${related}">
+                <div th:replace="~{fragments/product-card :: card(${p})}"></div>
+            </th:block>
+        </div>
+    </section>
+
+</main>
+
+<div th:replace="~{fragments/newsletter :: newsletter}"></div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/cart-drawer :: drawer}"></div>
+
+<script th:src="@{/js/main.js}" defer></script>
+</body>
+</html>

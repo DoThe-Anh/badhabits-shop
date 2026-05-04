@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Admin — Đơn hàng</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body class="admin">
+
+<div th:replace="~{admin/fragments/layout :: sidebar('orders')}"></div>
+
+<main class="admin-main">
+    <header class="admin-header">
+        <h1>Đơn hàng</h1>
+        <p class="admin-header__sub">Tất cả đơn hàng sắp theo thời gian đặt.</p>
+    </header>
+
+    <div th:replace="~{admin/fragments/layout :: flash}"></div>
+
+    <div th:if="${#lists.isEmpty(orders)}" class="admin-empty">
+        Chưa có đơn hàng nào.
+    </div>
+
+    <table th:unless="${#lists.isEmpty(orders)}" class="admin-table">
+        <thead>
+        <tr>
+            <th>Mã đơn</th>
+            <th>Thời gian</th>
+            <th>Khách hàng</th>
+            <th>Email</th>
+            <th>Tổng tiền</th>
+            <th>Trạng thái</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="order : ${orders}">
+            <td>
+                <a th:href="@{'/admin/orders/' + ${order.id}}"
+                   th:text="${order.orderCode}">BH1001</a>
+            </td>
+            <td th:text="${#temporals.format(order.placedAt, 'dd/MM/yyyy HH:mm')}">—</td>
+            <td th:text="${order.fullName}">—</td>
+            <td th:text="${order.email}">—</td>
+            <td th:text="${order.totalFormatted()}">0₫</td>
+            <td>
+                <span class="admin-status"
+                      th:classappend="'admin-status--' + ${#strings.toLowerCase(order.status.name())}"
+                      th:text="${order.statusLabel()}">Chờ xác nhận</span>
+            </td>
+            <td>
+                <a th:href="@{'/admin/orders/' + ${order.id}}"
+                   class="admin-link">Xem →</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+
+</body>
+</html>

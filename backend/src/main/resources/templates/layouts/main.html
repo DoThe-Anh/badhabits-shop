@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${pageTitle != null ? pageTitle + ' — BAD HABITS' : 'BAD HABITS STORE'}">BAD HABITS STORE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+    <div th:replace="~{fragments/announcement-bar :: announcement}"></div>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main th:replace="${contentFragment}"></main>
+
+    <div th:replace="~{fragments/newsletter :: newsletter}"></div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/cart-drawer :: drawer}"></div>
+
+    <script th:src="@{/js/main.js}" defer></script>
+</body>
+</html>

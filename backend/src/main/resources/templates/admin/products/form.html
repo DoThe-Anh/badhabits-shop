@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${isEdit} ? 'Admin — Sửa sản phẩm' : 'Admin — Thêm sản phẩm'">Sản phẩm</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <style>
+        .form-grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; max-width:900px; }
+        .form-grid .col-full { grid-column: 1 / -1; }
+        .form-grid label { display:block; font-weight:600; font-size:13px; color:#374151; margin-bottom:4px; }
+        .form-grid input[type=text],
+        .form-grid input[type=number],
+        .form-grid input[type=url],
+        .form-grid input[type=file],
+        .form-grid select,
+        .form-grid textarea {
+            width:100%; padding:8px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:14px;
+        }
+        .form-grid textarea { font-family: monospace; resize: vertical; min-height:80px; }
+        .form-grid .help { font-size:12px; color:#6b7280; margin-top:4px; }
+        .form-actions { margin-top:20px; display:flex; gap:12px; }
+        .preview-img { max-width:120px; max-height:120px; margin-top:6px; border-radius:6px; }
+    </style>
+</head>
+<body class="admin">
+
+<div th:replace="~{admin/fragments/layout :: sidebar('products')}"></div>
+
+<main class="admin-main">
+    <header class="admin-header">
+        <h1 th:text="${isEdit} ? 'Sửa sản phẩm #' + ${product.getId()} : 'Thêm sản phẩm'">Sản phẩm</h1>
+        <p class="admin-header__sub">
+            <a th:href="@{/admin/products}">← Quay lại danh sách</a>
+        </p>
+    </header>
+
+    <div th:replace="~{admin/fragments/layout :: flash}"></div>
+
+    <form th:action="${isEdit} ? @{'/admin/products/' + ${product.getId()}} : @{/admin/products}"
+          method="post" enctype="multipart/form-data" class="form-grid">
+
+        <div>
+            <label>Tên sản phẩm *</label>
+            <input type="text" name="name" th:value="${product.name()}" required maxlength="500"/>
+        </div>
+
+        <div>
+            <label>Slug (URL) *</label>
+            <input type="text" name="slug" th:value="${product.slug()}" required maxlength="200"
+                   placeholder="ao-thun-co-tron-den"/>
+            <div class="help">Dùng cho URL <code>/product/&lt;slug&gt;</code>. Chữ thường, gạch ngang.</div>
+        </div>
+
+        <div>
+            <label>Danh mục *</label>
+            <select name="categorySlug" required>
+                <option value="">— Chọn danh mục —</option>
+                <option th:each="c : ${categories}"
+                        th:value="${c.slug()}"
+                        th:text="${c.name()}"
+                        th:selected="${product.categorySlug() == c.slug()}"></option>
+            </select>
+            <div class="help">
+                <a th:href="@{/admin/categories/new}" target="_blank">+ Thêm danh mục mới</a>
+            </div>
+        </div>
+
+        <div>
+            <label>Collection</label>
+            <input type="text" name="collection" th:value="${product.collection()}" maxlength="100"
+                   placeholder="HO25, HIT BACK..."/>
+        </div>
+
+        <div>
+            <label>Giá (VND) *</label>
+            <input type="number" name="price" th:value="${product.price()}" required min="0" step="1000"/>
+        </div>
+
+        <div>
+            <label>Giá gốc (VND) — để trống nếu không sale</label>
+            <input type="number" name="originalPrice" th:value="${product.originalPrice()}" min="0" step="1000"/>
+        </div>
+
+        <div class="col-full">
+            <label>Ảnh chính *</label>
+            <input type="file" name="primaryImageFile" accept="image/*"/>
+            <div class="help">Hoặc dán URL ảnh:</div>
+            <input type="url" name="primaryImageUrl" placeholder="https://… hoặc /uploads/..."/>
+            <div th:if="${product.primaryImage()}">
+                <div class="help">Ảnh hiện tại:</div>
+                <img th:src="${product.primaryImage()}" class="preview-img" alt="Ảnh chính"/>
+            </div>
+        </div>
+
+        <div class="col-full">
+            <label>Ảnh hover (khi rê chuột)</label>
+            <input type="file" name="hoverImageFile" accept="image/*"/>
+            <input type="url" name="hoverImageUrl" placeholder="(URL nếu không upload)"/>
+            <div th:if="${product.hoverImage()}">
+                <img th:src="${product.hoverImage()}" class="preview-img" alt="Hover"/>
+            </div>
+        </div>
+
+        <div class="col-full">
+            <label>Gallery (1 URL / dòng)</label>
+            <textarea name="gallery" rows="4"
+                      th:text="${#strings.listJoin(product.gallery(), '&#10;')}"></textarea>
+        </div>
+
+        <div>
+            <label>Sizes (cách nhau dấu phẩy)</label>
+            <input type="text" name="sizes"
+                   th:value="${#strings.listJoin(product.sizes(), ', ')}"
+                   placeholder="S, M, L, XL"/>
+        </div>
+
+        <div>
+            <label>Màu (1 dòng "TÊN,#HEX")</label>
+            <textarea name="colors" rows="3" placeholder="BLACK,#0a0a0a&#10;WHITE,#ffffff"
+                      th:text="${#strings.listJoin(product.colors().![name() + ',' + hex()], '&#10;')}"></textarea>
+        </div>
+
+        <div>
+            <label>Tồn kho *</label>
+            <input type="number" name="stock" th:value="${product.stock()}" required min="0"/>
+        </div>
+
+        <div>
+            <label>Cờ trạng thái</label>
+            <label style="font-weight:400;display:block;margin-top:6px;">
+                <input type="checkbox" name="isNew" value="true" th:checked="${product.isNew()}"/> Hàng mới (NEW)
+            </label>
+            <label style="font-weight:400;display:block;">
+                <input type="checkbox" name="isFeatured" value="true" th:checked="${product.isFeatured()}"/> Nổi bật (FEATURED)
+            </label>
+        </div>
+
+        <div class="col-full">
+            <label>Mô tả</label>
+            <textarea name="description" rows="3" th:text="${product.description()}"></textarea>
+        </div>
+
+        <div class="col-full">
+            <label>Chất liệu</label>
+            <textarea name="material" rows="2" th:text="${product.material()}"></textarea>
+        </div>
+
+        <div class="col-full form-actions">
+            <button type="submit" class="btn btn--primary"
+                    th:text="${isEdit} ? 'Cập nhật' : 'Tạo sản phẩm'">Lưu</button>
+            <a th:href="@{/admin/products}" class="btn">Huỷ</a>
+        </div>
+    </form>
+</main>
+
+</body>
+</html>

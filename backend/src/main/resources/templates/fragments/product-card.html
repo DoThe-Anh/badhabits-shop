@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<article th:fragment="card(product)" class="product-card" role="group" aria-label="Product card">
+    <a th:href="@{'/product/' + ${product.slug()}}" class="product-card__link">
+        <div class="product-card__media">
+            <img class="product-card__image"
+                 th:src="${product.primaryImage()}"
+                 th:alt="${product.name()}"
+                 loading="lazy"/>
+
+            <span th:if="${product.onSale()}"
+                  class="product-card__discount"
+                  th:text="'-' + ${product.discountPercent()} + '%'">-34%</span>
+        </div>
+
+        <div class="product-card__body">
+            <h3 class="product-card__name" th:text="${product.name()}">
+                Tên sản phẩm mẫu — dòng 1 có thể kéo dài sang dòng 2
+            </h3>
+
+            <div class="product-card__meta">
+                <div class="product-card__price">
+                    <span class="product-card__price-value" th:text="${product.priceFormatted()}">165.000₫</span>
+                </div>
+                <span class="product-card__sold">Đã bán 10k+</span>
+            </div>
+        </div>
+    </a>
+
+    <a th:href="@{'/product/' + ${product.slug()}}" class="product-card__similar">
+        Tìm sản phẩm tương tự
+    </a>
+</article>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Admin — Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body class="admin">
+
+<div th:replace="~{admin/fragments/layout :: sidebar('dashboard')}"></div>
+
+<main class="admin-main">
+    <header class="admin-header">
+        <h1>Dashboard</h1>
+        <p class="admin-header__sub">Tổng quan hoạt động cửa hàng.</p>
+    </header>
+
+    <div th:replace="~{admin/fragments/layout :: flash}"></div>
+
+    <section class="admin-stats">
+        <article class="admin-stat">
+            <p class="admin-stat__label">Người dùng</p>
+            <p class="admin-stat__value" th:text="${userCount}">0</p>
+            <p class="admin-stat__meta">
+                Admin: <strong th:text="${adminCount}">0</strong>
+            </p>
+        </article>
+        <article class="admin-stat">
+            <p class="admin-stat__label">Đơn hàng</p>
+            <p class="admin-stat__value" th:text="${orderCount}">0</p>
+            <p class="admin-stat__meta">
+                <a th:href="@{/admin/orders}">Xem tất cả →</a>
+            </p>
+        </article>
+        <article class="admin-stat">
+            <p class="admin-stat__label">Sản phẩm</p>
+            <p class="admin-stat__value" th:text="${productCount}">0</p>
+            <p class="admin-stat__meta">
+                Sắp hết (&lt; <span th:text="${lowStockThreshold}">10</span>):
+                <strong th:text="${lowStockCount}">0</strong>
+            </p>
+        </article>
+        <article class="admin-stat">
+            <p class="admin-stat__label">Doanh thu</p>
+            <p class="admin-stat__value"
+               th:text="${#numbers.formatDecimal(revenue, 0, 'POINT', 0, 'COMMA')} + '₫'">0₫</p>
+            <p class="admin-stat__meta">Tổng tất cả đơn đã đặt</p>
+        </article>
+    </section>
+
+    <section class="admin-card" th:if="${lowStockCount > 0}">
+        <h2>Sản phẩm sắp hết hàng</h2>
+        <table class="admin-table">
+            <thead>
+            <tr>
+                <th></th>
+                <th>Tên</th>
+                <th>Danh mục</th>
+                <th>Tồn kho</th>
+                <th>Giá</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${lowStock}">
+                <td class="admin-table__thumb">
+                    <img th:if="${p.primaryImage()}" th:src="${p.primaryImage()}" th:alt="${p.name()}"/>
+                </td>
+                <td th:text="${p.name()}">—</td>
+                <td th:text="${p.categorySlug()}">—</td>
+                <td>
+                    <span class="admin-status admin-status--cancelled"
+                          th:text="${p.stock()}">0</span>
+                </td>
+                <td th:text="${p.priceFormatted()}">0₫</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Admin — Sản phẩm</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+    <style>
+        .admin-pagination { margin-top:16px; display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+        .admin-pagination a, .admin-pagination span.page {
+            display:inline-block; padding:6px 12px; border:1px solid #d1d5db;
+            border-radius:6px; font-size:13px; color:#374151; text-decoration:none;
+        }
+        .admin-pagination a:hover { background:#f3f4f6; }
+        .admin-pagination .is-active {
+            background:#111827; color:#fff; border-color:#111827; cursor:default;
+        }
+        .admin-pagination .is-disabled { color:#9ca3af; pointer-events:none; }
+        .admin-pagination .info { margin-left:auto; color:#6b7280; font-size:13px; }
+    </style>
+</head>
+<body class="admin">
+
+<div th:replace="~{admin/fragments/layout :: sidebar('products')}"></div>
+
+<main class="admin-main">
+    <header class="admin-header">
+        <h1>Sản phẩm</h1>
+        <p class="admin-header__sub">
+            Tổng <strong th:text="${totalCount}">0</strong> sản phẩm ·
+            Tồn kho <strong th:text="${totalStock}">0</strong> ·
+            Sắp hết hàng (&lt; <span th:text="${lowStockThreshold}">10</span>):
+            <strong th:text="${lowStockCount}">0</strong>
+        </p>
+        <a th:href="@{/admin/products/new}" class="btn btn--primary" style="float:right;margin-top:-48px;">
+            + Thêm sản phẩm
+        </a>
+    </header>
+
+    <div th:replace="~{admin/fragments/layout :: flash}"></div>
+
+    <form method="get" th:action="@{/admin/products}" class="admin-filters">
+        <label>
+            <span>Tìm:</span>
+            <input type="search" name="q" th:value="${selectedQuery}"
+                   placeholder="Tên hoặc slug..." style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;min-width:220px;"/>
+        </label>
+        <label>
+            <span>Danh mục:</span>
+            <select name="category" onchange="this.form.submit()">
+                <option value="" th:selected="${selectedCategory == ''}">Tất cả</option>
+                <option th:each="c : ${categories}"
+                        th:value="${c.slug()}"
+                        th:text="${c.name()}"
+                        th:selected="${selectedCategory == c.slug()}"></option>
+            </select>
+        </label>
+        <label>
+            <span>Sắp xếp:</span>
+            <select name="sort" onchange="this.form.submit()">
+                <option value="name"       th:selected="${selectedSort == 'name'}">Tên (A→Z)</option>
+                <option value="stock-asc"  th:selected="${selectedSort == 'stock-asc'}">Tồn kho ↑</option>
+                <option value="stock-desc" th:selected="${selectedSort == 'stock-desc'}">Tồn kho ↓</option>
+                <option value="price-asc"  th:selected="${selectedSort == 'price-asc'}">Giá ↑</option>
+                <option value="price-desc" th:selected="${selectedSort == 'price-desc'}">Giá ↓</option>
+            </select>
+        </label>
+        <label>
+            <span>Mỗi trang:</span>
+            <select name="size" onchange="this.form.submit()">
+                <option th:each="s : ${ {10, 20, 50, 100} }"
+                        th:value="${s}" th:text="${s}"
+                        th:selected="${selectedSize == s}"></option>
+            </select>
+        </label>
+        <button type="submit" class="btn">Lọc</button>
+        <a th:if="${selectedQuery != '' or selectedCategory != '' or selectedSort != 'name'}"
+           th:href="@{/admin/products}" class="admin-link" style="margin-left:8px;">Xoá lọc</a>
+        <span class="admin-muted" th:text="'Hiển thị ' + ${productPage.numberOfElements} + ' / ' + ${filteredCount} + ' (tổng ' + ${totalCount} + ' sản phẩm)'">—</span>
+    </form>
+
+    <div th:if="${#lists.isEmpty(products)}" class="admin-empty">
+        Chưa có sản phẩm nào.
+        <a th:href="@{/admin/products/new}">Thêm sản phẩm đầu tiên</a>.
+    </div>
+
+    <table th:unless="${#lists.isEmpty(products)}" class="admin-table">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Tên sản phẩm</th>
+            <th>Slug / ID</th>
+            <th>Danh mục</th>
+            <th>Giá</th>
+            <th>Tồn kho</th>
+            <th>Thuộc tính</th>
+            <th>Thao tác</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${products}">
+            <td class="admin-table__thumb">
+                <img th:if="${p.primaryImage()}" th:src="${p.primaryImage()}" th:alt="${p.name()}" loading="lazy"/>
+            </td>
+            <td>
+                <a th:href="@{'/product/' + ${p.slug()}}" target="_blank"
+                   th:text="${p.name()}" class="admin-link">Tên</a>
+            </td>
+            <td>
+                <code th:text="${p.getId()}">1</code>
+                <div class="admin-muted" th:text="${p.slug()}">slug</div>
+            </td>
+            <td th:text="${categoryNames[p.categorySlug()] ?: p.categorySlug()}">—</td>
+            <td>
+                <strong th:text="${p.priceFormatted()}">0₫</strong>
+                <div th:if="${p.onSale()}" class="admin-muted">
+                    <s th:text="${p.originalPriceFormatted()}">0₫</s>
+                    <span th:text="' (-' + ${p.discountPercent()} + '%)'"></span>
+                </div>
+            </td>
+            <td>
+                <span class="admin-status"
+                      th:classappend="${p.stock() == 0} ? 'admin-status--cancelled'
+                                      : (${p.stock() &lt; lowStockThreshold} ? 'admin-status--shipping' : 'admin-status--completed')"
+                      th:text="${p.stock()}">0</span>
+            </td>
+            <td>
+                <span th:if="${p.isNew()}" class="admin-status admin-status--pending">NEW</span>
+                <span th:if="${p.isFeatured()}" class="admin-status admin-status--admin">FEATURED</span>
+                <span th:if="${p.onSale()}" class="admin-status admin-status--cancelled">SALE</span>
+            </td>
+            <td>
+                <a th:href="@{'/admin/products/' + ${p.getId()} + '/edit'}" class="admin-link">Sửa</a>
+                <form th:action="@{'/admin/products/' + ${p.getId()} + '/delete'}" method="post"
+                      style="display:inline;margin-left:8px;"
+                      onsubmit="return confirm('Xoá sản phẩm này?');">
+                    <button type="submit" class="admin-link" style="background:none;border:0;color:#c62828;cursor:pointer;">Xoá</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <nav th:if="${productPage.totalPages > 1}" class="admin-pagination">
+        <a th:if="${productPage.hasPrevious()}"
+           th:href="@{/admin/products(page=${productPage.number - 1}, size=${selectedSize}, q=${selectedQuery}, category=${selectedCategory}, sort=${selectedSort})}">‹ Trước</a>
+        <span th:unless="${productPage.hasPrevious()}" class="page is-disabled">‹ Trước</span>
+
+        <a th:each="i : ${#numbers.sequence(0, productPage.totalPages - 1)}"
+           th:href="@{/admin/products(page=${i}, size=${selectedSize}, q=${selectedQuery}, category=${selectedCategory}, sort=${selectedSort})}"
+           th:classappend="${i == productPage.number} ? 'is-active'"
+           th:text="${i + 1}">1</a>
+
+        <a th:if="${productPage.hasNext()}"
+           th:href="@{/admin/products(page=${productPage.number + 1}, size=${selectedSize}, q=${selectedQuery}, category=${selectedCategory}, sort=${selectedSort})}">Sau ›</a>
+        <span th:unless="${productPage.hasNext()}" class="page is-disabled">Sau ›</span>
+
+        <span class="info"
+              th:text="'Trang ' + (${productPage.number} + 1) + ' / ' + ${productPage.totalPages}">Trang 1 / 1</span>
+    </nav>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="'Admin — ' + ${order.orderCode}">Admin — Order</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body class="admin">
+
+<div th:replace="~{admin/fragments/layout :: sidebar('orders')}"></div>
+
+<main class="admin-main">
+    <header class="admin-header">
+        <h1 th:text="'Đơn hàng ' + ${order.orderCode}">Order</h1>
+        <p class="admin-header__sub">
+            Đặt lúc <span th:text="${#temporals.format(order.placedAt, 'dd/MM/yyyy HH:mm')}"></span>
+        </p>
+        <p>
+            <a th:href="@{/admin/orders}" class="admin-link">← Về danh sách</a>
+        </p>
+    </header>
+
+    <div th:replace="~{admin/fragments/layout :: flash}"></div>
+
+    <section class="admin-card">
+        <h2>Thông tin khách hàng</h2>
+        <dl class="admin-dl">
+            <div><dt>Họ tên</dt><dd th:text="${order.fullName}">—</dd></div>
+            <div><dt>Email</dt><dd th:text="${order.email}">—</dd></div>
+            <div><dt>Điện thoại</dt><dd th:text="${order.phone}">—</dd></div>
+            <div><dt>Địa chỉ</dt>
+                <dd><span th:text="${order.address}"></span>, <span th:text="${order.city}"></span></dd>
+            </div>
+            <div th:if="${order.note}"><dt>Ghi chú</dt><dd th:text="${order.note}">—</dd></div>
+            <div><dt>Thanh toán</dt>
+                <dd th:text="${order.paymentMethod == 'cod'} ? 'COD — Thu tiền khi giao hàng' :
+                             (${order.paymentMethod == 'bank'} ? 'Chuyển khoản ngân hàng' :
+                             (${order.paymentMethod == 'momo'} ? 'Ví MoMo' : ${order.paymentMethod}))">—</dd>
+            </div>
+            <div><dt>Tài khoản</dt>
+                <dd th:text="${order.user != null ? order.user.email() : 'Guest'}">—</dd>
+            </div>
+        </dl>
+    </section>
+
+    <section class="admin-card">
+        <h2>Sản phẩm</h2>
+        <table class="admin-table">
+            <thead>
+            <tr>
+                <th></th>
+                <th>Tên</th>
+                <th>Size · Màu</th>
+                <th>Đơn giá</th>
+                <th>SL</th>
+                <th>Thành tiền</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${order.items}">
+                <td class="admin-table__thumb">
+                    <img th:if="${item.image}" th:src="${item.image}" th:alt="${item.name}"/>
+                </td>
+                <td th:text="${item.name}">—</td>
+                <td>
+                    <span th:if="${item.size}" th:text="${item.size}"></span>
+                    <span th:if="${item.size != null and item.color != null}"> · </span>
+                    <span th:if="${item.color}" th:text="${item.color}"></span>
+                </td>
+                <td th:text="${item.priceFormatted}">0₫</td>
+                <td th:text="${item.quantity}">1</td>
+                <td th:text="${item.lineTotalFormatted}">0₫</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="admin-dl admin-dl--totals">
+            <div><dt>Tạm tính</dt><dd th:text="${order.subtotalFormatted()}">0₫</dd></div>
+            <div><dt>Vận chuyển</dt><dd th:text="${order.shippingFormatted()}">0₫</dd></div>
+            <div class="admin-dl__total">
+                <dt>Tổng cộng</dt><dd th:text="${order.totalFormatted()}">0₫</dd>
+            </div>
+        </dl>
+    </section>
+
+    <section class="admin-card">
+        <h2>Trạng thái</h2>
+        <p>
+            Trạng thái hiện tại:
+            <span class="admin-status"
+                  th:classappend="'admin-status--' + ${#strings.toLowerCase(order.status.name())}"
+                  th:text="${order.statusLabel()}">Chờ xác nhận</span>
+        </p>
+        <form th:action="@{'/admin/orders/' + ${order.id} + '/status'}" method="post" class="admin-inline-form">
+            <label>
+                Cập nhật:
+                <select name="status">
+                    <option th:each="s : ${statusOptions}"
+                            th:value="${s.name()}"
+                            th:text="${s.label()}"
+                            th:selected="${s == order.status}"></option>
+                </select>
+            </label>
+            <button type="submit" class="btn btn--primary">Lưu</button>
+        </form>
+    </section>
+</main>
+
+</body>
+</html>

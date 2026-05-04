@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="newsletter" class="newsletter">
+    <div class="newsletter__inner">
+        <h2 class="newsletter__title">THAM GIA CỘNG ĐỒNG BAD HABITS</h2>
+        <p class="newsletter__sub">
+            Nhận thông tin về drop mới, sale và voucher độc quyền. Giảm 10% cho đơn đầu tiên.
+        </p>
+        <form class="newsletter__form" onsubmit="event.preventDefault();this.querySelector('[data-msg]').hidden=false;this.reset();">
+            <input type="email" name="email" placeholder="Email của bạn" required
+                   autocomplete="email" class="newsletter__input"/>
+            <button type="submit" class="newsletter__btn">ĐĂNG KÝ</button>
+            <p class="newsletter__msg" data-msg hidden>Cảm ơn bạn! Kiểm tra email để xác nhận.</p>
+        </form>
+    </div>
+</section>
+</body>
+</html>
