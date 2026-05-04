@@ -1,0 +1,76 @@
+# =============================================================================
+# docker-compose cho local dev — MySQL 8 + Spring Boot app
+#
+# Chạy:
+#   cd docker
+#   docker compose up --build           # build + start
+#   docker compose down                 # stop
+#   docker compose down -v              # stop + xoá volume MySQL (reset DB)
+#
+# Truy cập:
+#   App        → http://localhost:8080
+#   MySQL host → localhost:3306 (user root / password trong .env)
+# =============================================================================
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: shop-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: shop
+    ports:
+      - "3306:3306"   # expose ra host để debug bằng MySQL Workbench/DBeaver nếu cần
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_ROOT_PASSWORD:-root}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    container_name: shop-phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      UPLOAD_LIMIT: 50M
+    ports:
+      - "8081:80"
+
+  app:
+    build:
+      context: ..              # project root làm build context
+      dockerfile: docker/Dockerfile
+    container_name: shop-app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      # Spring relaxed binding: SPRING_DATASOURCE_URL → spring.datasource.url
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/shop?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true&characterEncoding=utf8"
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      # Admin bootstrap (DataInitializer đọc qua application.properties)
+      ADMIN_EMAIL:    ${ADMIN_EMAIL:-admin@bh.vn}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      # Upload dir = mount point bên dưới
+      APP_UPLOAD_DIR: /uploads
+    ports:
+      - "8080:8080"
+    volumes:
+      # Mount uploads/ ở host vào /uploads trong container
+      # → ảnh upload không mất khi rebuild image
+      - ../uploads:/uploads
+
+volumes:
+  mysql-data:
