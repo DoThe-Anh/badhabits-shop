@@ -26,6 +26,13 @@
         <h1>GIỎ HÀNG CỦA BẠN</h1>
     </header>
 
+    <div th:if="${checkoutError}" class="cart-alert"
+         style="background:#fdecea;border:1px solid #f5c6cb;color:#721c24;
+                padding:0.75rem 1rem;margin-bottom:1rem;border-radius:4px;font-size:0.95rem;"
+         th:text="${checkoutError}">
+        Có lỗi khi đặt hàng.
+    </div>
+
     <div th:if="${cart.empty}" class="cart-empty">
         <p>Giỏ hàng của bạn đang trống.</p>
         <a th:href="@{/shop}" class="btn btn--primary">TIẾP TỤC MUA SẮM</a>
