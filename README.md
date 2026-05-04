@@ -185,7 +185,7 @@ Unit tests dùng JUnit 5 + Mockito. `ProductServiceImplTest` có 13 test cases l
 
 | Lỗi | Fix |
 |---|---|
-| `Bind for 0.0.0.0:3306 failed: port already allocated` | XAMPP MySQL đang chạy → tắt, hoặc đổi port trong `docker-compose.yml` |
+| `Bind for 0.0.0.0:3307 failed: port already allocated` | Có MySQL khác đang chiếm 3307 → đổi port trong `docker-compose.yml` |
 | App chạy code cũ sau khi sửa Java | `docker compose up -d --build` *(thiếu `--build` là dùng image cũ)* |
 | Whitelabel 500 / Bad credentials | `docker compose logs app --tail 100` xem stacktrace |
 | MySQL container restart loop | `docker compose down -v && docker compose up -d --build` |

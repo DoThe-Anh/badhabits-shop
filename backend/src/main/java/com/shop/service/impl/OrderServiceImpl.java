@@ -5,8 +5,12 @@ import com.shop.entity.CartItem;
 import com.shop.entity.Order;
 import com.shop.entity.OrderDetail;
 import com.shop.entity.OrderStatus;
+import com.shop.entity.Product;
 import com.shop.entity.User;
+import com.shop.exception.OutOfStockException;
+import com.shop.exception.ProductNotFoundException;
 import com.shop.repository.OrderRepository;
+import com.shop.repository.ProductRepository;
 import com.shop.service.OrderService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,9 +22,12 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
 
-    public OrderServiceImpl(OrderRepository orderRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository,
+                            ProductRepository productRepository) {
         this.orderRepository = orderRepository;
+        this.productRepository = productRepository;
     }
 
     @Override
@@ -28,6 +35,21 @@ public class OrderServiceImpl implements OrderService {
     public Order placeOrder(Cart cart, User user, CheckoutRequest request) {
         if (cart.isEmpty()) {
             throw new IllegalStateException("Giỏ hàng trống");
+        }
+
+        // Lock + decrement stock cho từng item. Nếu bất kỳ item nào không đủ tồn,
+        // ném OutOfStockException → @Transactional rollback toàn bộ (kể cả các trừ stock trước đó).
+        for (CartItem cartItem : cart.getItems()) {
+            Long productId = parseProductId(cartItem.getProductId());
+            Product product = productRepository.findByIdForUpdate(productId)
+                    .orElseThrow(() -> new ProductNotFoundException(productId));
+
+            int requested = cartItem.getQuantity();
+            int available = product.stock();
+            if (available < requested) {
+                throw new OutOfStockException(product.name(), requested, available);
+            }
+            product.setStock(available - requested);
         }
 
         Order order = new Order(
@@ -88,8 +110,15 @@ public class OrderServiceImpl implements OrderService {
         return order;
     }
 
+    private static Long parseProductId(String raw) {
+        try {
+            return Long.valueOf(raw);
+        } catch (NumberFormatException e) {
+            throw new ProductNotFoundException(raw);
+        }
+    }
+
     private String nextOrderCode() {
-        // Epoch-ms suffix — unique across restarts without needing a DB sequence.
         return "BH" + System.currentTimeMillis();
     }
 }

@@ -21,7 +21,10 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
       MYSQL_DATABASE: shop
     ports:
-      - "3306:3306"   # expose ra host để debug bằng MySQL Workbench/DBeaver nếu cần
+      # Host:container — dùng 3307 ở host để KHÔNG xung đột với XAMPP MySQL (3306).
+      # Trong Docker network, app/phpmyadmin vẫn nối qua tên service "mysql:3306".
+      # Từ host (DBeaver/MySQL Workbench): connect localhost:3307.
+      - "3307:3306"
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
