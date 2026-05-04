@@ -1,0 +1,57 @@
+# =============================================================================
+# .dockerignore — loại trừ khỏi build context (cho COPY trong Dockerfile)
+# Build context = project root → mọi pattern ở đây tính từ project root.
+# =============================================================================
+
+# Build outputs — không cần copy vào image, sẽ rebuild trong container
+backend/target/
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+
+# IDE / editor
+.idea/
+.vscode/
+*.iml
+
+# Git / VCS
+.git/
+.gitignore
+.gitattributes
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Node / frontend artifacts (nếu sau này có)
+node_modules/
+dist/
+build/
+
+# Local env files — secrets không bao giờ vào image
+**/.env
+**/.env.local
+
+# Local DB / runtime data
+data/
+backend/data/
+
+# Uploads — mount qua volume runtime, không bake vào image
+uploads/
+
+# Logs
+*.log
+
+# Docs — không cần cho runtime
+ARCHITECTURE.md
+README.md
+CLAUDE.md
+database/
+
+# Frontend folder (currently empty/option)
+frontend/
+
+# Public/tests folders (legacy empty)
+public/
+tests/
+package.json
